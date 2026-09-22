@@ -13,7 +13,6 @@ settings, so Hermes auto-updates keep working normally.
 | 2 | Arrows everywhere instead of pointer hands; I-beam kept inside text fields; grab hand on native sliders & drag handles | `plugins/hermes-look` (CSS) | delete the plugin folder |
 | 3 | GitHub-Copilot-flavored sidebar + chat look, following your Light/Dark setting automatically | `plugins/hermes-look` (seed-token override) | delete the plugin folder |
 | 4 | Readable tooltips (high-contrast chip in both themes) | `plugins/hermes-look` (CSS) | delete the plugin folder |
-| 5 | Solid (non-translucent) window | **native setting** — Settings → Appearance → Translucency, set to *Clear 0%* (or off) | set it back |
 
 Items 1–4 are one plugin (the `hermes-look` folder). Item 5 is done in the app's
 own Settings — a CSS plugin can't change native window transparency, so that one

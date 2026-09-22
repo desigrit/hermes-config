@@ -58,15 +58,19 @@ input[type='range']:active { cursor: grabbing !important; }
 //     - USER_BUBBLE_BASE_CLASS: "composer-human-message … w-full …
 //       rounded-xl border bg-(--dt-user-bubble)"
 //     - StickyHumanMessageContainer: "self-end" (container already right-aligned)
-//     - styles.css has no competing width rule on this element.
+//     - User row: "group/user-message … -mx-4 px-4 …" + data-role/data-slot
+//   Look per user prefs: rounded corners, NO border line, close to the right edge.
 // ─────────────────────────────────────────────────────────────────────────
 const CSS_BUBBLES = `
 .composer-human-message {
   width: fit-content !important;
   max-width: 100% !important;
-  margin-left: auto !important;
-  margin-right: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 14px !important;
+  padding-right: 4px !important;   /* was pr-9(36px) — was the big right gap  */
 }
+.composer-human-message:hover { border: none !important; }
 `
 
 const CSS = [CSS_TITLEBAR, CSS_CURSOR, CSS_BUBBLES].join('\n')
@@ -81,11 +85,15 @@ export default {
     'is fully Hermes\u2019 own. Delete this folder to revert.',
   register() {
     if (typeof document === 'undefined') return
-    if (!document.getElementById(STYLE_ID)) {
-      const el = document.createElement('style')
+    // Idempotent: update the living style tag instead of skipping it, so an
+    // in-place hot-reload (loader re-invokes register without removing the
+    // element) actually picks up the new CSS.
+    let el = document.getElementById(STYLE_ID)
+    if (!el) {
+      el = document.createElement('style')
       el.id = STYLE_ID
-      el.textContent = CSS
       document.head.append(el)
     }
+    el.textContent = CSS
   }
 }

@@ -4,6 +4,7 @@
 // Contents (each block independently removable):
 //   A. Titlebar buttons — hide: Layout editor, HUD mode, Swap sidebar
 //   B. Cursor — arrow everywhere; I-beam in text fields; keep grab on drag
+//   C. Chat bubbles — user messages hug their content, parked right (Codex-style)
 //
 // Loader contract (verified, contrib/runtime-loader.ts):
 //   blob import() → mod.default = { id, register() } ; defaultEnabled ⇒ true
@@ -47,15 +48,37 @@ input[type='range'] { cursor: grab !important; }
 input[type='range']:active { cursor: grabbing !important; }
 `
 
-const CSS = [CSS_TITLEBAR, CSS_CURSOR].join('\n')
+// ─────────────────────────────────────────────────────────────────────────
+// C. CHAT BUBBLES (Codex-style user messages)
+//   Upstream already renders user turns as glass bubbles (.composer-human-message,
+//   inside a right-parked self-end container) — but stretches them w-full, so
+//   they read as flat full-width rows. Shrink-wrap the bubble and pin it
+//   right: exactly the Codex look, zero structural change.
+//   Verified vs components/assistant-ui/thread/user-message.tsx + styles.css:
+//     - USER_BUBBLE_BASE_CLASS: "composer-human-message … w-full …
+//       rounded-xl border bg-(--dt-user-bubble)"
+//     - StickyHumanMessageContainer: "self-end" (container already right-aligned)
+//     - styles.css has no competing width rule on this element.
+// ─────────────────────────────────────────────────────────────────────────
+const CSS_BUBBLES = `
+.composer-human-message {
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+`
+
+const CSS = [CSS_TITLEBAR, CSS_CURSOR, CSS_BUBBLES].join('\n')
 
 export default {
   id: 'hermes-look',
   name: 'Hermes Look',
   description:
-    'Hides 3 titlebar buttons and normalizes the cursor (arrow app-wide, ' +
-    'I-beam kept in text, grab kept on the drag handles). Theme selection is ' +
-    'fully Hermes\u2019 own. Delete this folder to revert.',
+    'Hides 3 titlebar buttons, normalizes the cursor (arrow app-wide, ' +
+    'I-beam kept in text, grab kept on the drag handles), and parks user ' +
+    'messages as right-aligned, content-hugging bubbles. Theme selection ' +
+    'is fully Hermes\u2019 own. Delete this folder to revert.',
   register() {
     if (typeof document === 'undefined') return
     if (!document.getElementById(STYLE_ID)) {

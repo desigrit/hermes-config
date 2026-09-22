@@ -11,8 +11,9 @@ settings, so Hermes auto-updates keep working normally.
 |---|--------|-----|--------|
 | 1 | Hide the 3 top-right titlebar buttons (layout editor, HUD mode, swap sidebar) | `plugins/hermes-look` (CSS) | delete the plugin folder |
 | 2 | Arrows everywhere instead of pointer hands; I-beam kept inside text fields; grab hand on native sliders & drag handles | `plugins/hermes-look` (CSS) | delete the plugin folder |
+| 3 | Your messages hug their content and park on the right with the rounded glass border instead of flat full-width rows (Codex-style bubbles) | `plugins/hermes-look` (CSS) | delete the plugin folder |
 
-Both items are one plugin (the `hermes-look` folder).
+All three are one plugin (the `hermes-look` folder).
 
 ## Install
 
@@ -44,7 +45,9 @@ handful of inline CSS seed tokens (`--theme-*` on `<html>`) plus a small set of
 
 - hides the three titlebar icon buttons by their codicon classes
   (`.titlebar-icon-button:has(.codicon-…)`),
-- normalizes the cursor (arrow app-wide, I-beam in text, grab on slider/drag).
+- normalizes the cursor (arrow app-wide, I-beam in text, grab on slider/drag),
+- shrink-wraps user messages to their content and pins them right
+  (`.composer-human-message`), for Codex-style bubbles.
 
 It never touches app files and it never overrides your chosen theme — theme
 switching stays exactly as native. Updates to Hermes Desktop replace `src/` and
@@ -59,7 +62,7 @@ hermes-config/
 ├── README.md
 └── plugins/
     └── hermes-look/
-        └── plugin.js      # the whole thing (single-file, ESM, ~75 lines)
+        └── plugin.js      # the whole thing (single-file, ESM, ~90 lines)
 ```
 
 ## License

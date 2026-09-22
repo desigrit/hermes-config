@@ -11,7 +11,7 @@ settings, so Hermes auto-updates keep working normally.
 |---|--------|-----|--------|
 | 1 | Hide the 3 top-right titlebar buttons (layout editor, HUD mode, swap sidebar) | `plugins/hermes-look` (CSS) | delete the plugin folder |
 | 2 | Arrows everywhere instead of pointer hands; I-beam kept inside text fields; grab hand on native sliders & drag handles | `plugins/hermes-look` (CSS) | delete the plugin folder |
-| 3 | Your messages render as wide, right-pinned, centered border-less bubbles, matching the assistant column width for a clean Codex-style look | `plugins/hermes-look` (CSS) | delete the plugin folder |
+| 3 | Your messages render as right-pinned, content-hugging bubbles (up to ~2/3 of the column, long text wraps) with left-aligned text and no border line | `plugins/hermes-look` (CSS) | delete the plugin folder |
 
 All three are one plugin (the `hermes-look` folder).
 

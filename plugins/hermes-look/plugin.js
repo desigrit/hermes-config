@@ -51,24 +51,28 @@ input[type='range']:active { cursor: grabbing !important; }
 // ─────────────────────────────────────────────────────────────────────────
 // C. CHAT BUBBLES (Codex-style user messages)
 //   Upstream already renders user turns as glass bubbles (.composer-human-message,
-//   inside a right-parked self-end container) — but stretches them w-full, so
-//   they read as flat full-width rows. Shrink-wrap the bubble and pin it
-//   right: exactly the Codex look, zero structural change.
+//   inside a right-parked self-end container) — flat full-width rows with a
+//   border line and lopsided hover padding. Make them read as deliberate,
+//   wide, right-parked, centered bubbles: no structural change, CSS only.
 //   Verified vs components/assistant-ui/thread/user-message.tsx + styles.css:
 //     - USER_BUBBLE_BASE_CLASS: "composer-human-message … w-full …
 //       rounded-xl border bg-(--dt-user-bubble)"
 //     - StickyHumanMessageContainer: "self-end" (container already right-aligned)
 //     - User row: "group/user-message … -mx-4 px-4 …" + data-role/data-slot
-//   Look per user prefs: rounded corners, NO border line, close to the right edge.
+//   Look per user prefs: WIDE (same width as assistant text, feels natural),
+//   hard-parked at the right edge, text centered inside, rounded corners,
+//   NO border line.
 // ─────────────────────────────────────────────────────────────────────────
 const CSS_BUBBLES = `
 .composer-human-message {
-  width: fit-content !important;
-  max-width: 100% !important;
+  width: 100% !important;          /* full column = as wide as assistant rows */
+  margin: 0 !important;            /* flush to the column's right edge  */
   border: none !important;
   box-shadow: none !important;
   border-radius: 14px !important;
-  padding-right: 4px !important;   /* was pr-9(36px) — was the big right gap  */
+  padding-left: 16px !important;   /* symmetric, text truly centered   */
+  padding-right: 16px !important;  /* was pr-9(36px) hover-button slot */
+  text-align: center !important;
 }
 .composer-human-message:hover { border: none !important; }
 `
@@ -80,8 +84,8 @@ export default {
   name: 'Hermes Look',
   description:
     'Hides 3 titlebar buttons, normalizes the cursor (arrow app-wide, ' +
-    'I-beam kept in text, grab kept on the drag handles), and parks user ' +
-    'messages as right-aligned, content-hugging bubbles. Theme selection ' +
+    'I-beam kept in text, grab kept on the drag handles), and renders user ' +
+    'messages as wide, right-parked, centered border-less bubbles. Theme ' +
     'is fully Hermes\u2019 own. Delete this folder to revert.',
   register() {
     if (typeof document === 'undefined') return

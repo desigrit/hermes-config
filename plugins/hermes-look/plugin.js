@@ -4,7 +4,7 @@
 // Contents (each block independently removable):
 //   A. Titlebar buttons — hide: Layout editor, HUD mode, Swap sidebar
 //   B. Cursor — arrow everywhere; I-beam in text fields; keep grab on drag
-//   C. Chat bubbles — user messages hug their content, parked right (Codex-style)
+//   C. Chat bubbles — user messages wide, right-pinned, text centered inside
 //
 // Loader contract (verified, contrib/runtime-loader.ts):
 //   blob import() → mod.default = { id, register() } ; defaultEnabled ⇒ true

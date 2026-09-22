@@ -5,14 +5,6 @@
 //   A. Titlebar buttons — hide: Layout editor, HUD mode, Swap sidebar
 //   B. Cursor — arrow everywhere; I-beam in text fields; keep grab on drag
 //
-// Removed 2026-09-22 (user: "remove both block C and D"):
-//   C. GitHub Copilot seed re-skin + radii/shadows + inline-code chips —
-//      its MutationObserver re-applied fixed colors after every theme paint,
-//      which disabled the theme picker (any chosen theme was snapped back).
-//   D. High-contrast tooltip chip.
-//   Full prior version kept at:
-//   %LOCALAPPDATA%\Temp\hermes-config-backups\plugin.full-with-gh-skin-20260922.js
-//
 // Loader contract (verified, contrib/runtime-loader.ts):
 //   blob import() → mod.default = { id, register() } ; defaultEnabled ⇒ true
 

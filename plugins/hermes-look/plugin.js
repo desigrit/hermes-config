@@ -5,7 +5,11 @@
 //   A. Titlebar buttons — hide: Layout editor, HUD mode, Swap sidebar
 //   B. Cursor — arrow everywhere; I-beam in text fields; keep grab on drag
 //   C. Chat bubbles — user messages hug their content (≤70% wide), right-
-//      pinned, left-aligned text, border-less, rounded (Codex-style)
+//      parked, left-aligned text, border-less, rounded (Codex-style)
+//   D. Sticky bubble — UNPINNED: not pinned to the top of the scroller,
+//      no 2-line auto-clamp (full text always shown), no content clip
+//   E. Composer — chat input rendered as a plain gray, fully rounded,
+//      border-less well (no focus outline/ring either)
 //
 // Loader contract (verified, contrib/runtime-loader.ts):
 //   blob import() → mod.default = { id, register() } ; defaultEnabled ⇒ true
@@ -80,16 +84,102 @@ const CSS_BUBBLES = `
 .composer-human-message:hover { border: none !important; }
 `
 
-const CSS = [CSS_TITLEBAR, CSS_CURSOR, CSS_BUBBLES].join('\n')
+// ─────────────────────────────────────────────────────────────────────────
+// D. STICKY BUBBLE → UNPINNED
+//   Two independent upstream mechanisms do what the user reported as "the
+//   bubble stays pinned on top of the window while scrolling":
+//     1. CSS  — [data-slot='aui_user-message-root'] { position: sticky;
+//               top: ~4px }  (thread/user-message.tsx StickyHumanMessageContainer
+//               class "sticky …" + styles.css:1695)
+//     2. JS   — useStickyPromptClip.ts paints `--sticky-prompt-clip` inline on
+//               SIBLING elements under the pinned bubble; the only consumer is
+//               styles.css:1702 `[data-sticky-prompt-clip] { clip-path: inset(…) }`.
+//               → killing that one rule fully disables the clip with no source
+//               edit (hook re-paints a harmless var, nothing reads it).
+//   And the "auto-compact to ~2 lines" the user wants gone:
+//     3. CSS  — thread/user-message.tsx:397 adds class `sticky-human-clamp`
+//               → styles.css:1724 max-height ≈ 4 line-boxes + overflow:hidden
+//               (+ soft fade mask when clamped).
+//   All three are lifted with !important below — reversible, survives updates.
+// ─────────────────────────────────────────────────────────────────────────
+const CSS_UNSTICK = `
+[data-slot='aui_user-message-root'] {
+  position: relative !important;   /* out: the top-pin   */
+  top: auto !important;
+}
+.sticky-human-clamp {
+  max-height: none !important;     /* out: the ~2-line clamp  */
+  overflow: visible !important;
+  -webkit-mask-image: none !important;   /* out: the fade hint    */
+  mask-image: none !important;
+}
+[data-sticky-prompt-clip] {
+  clip-path: none !important;      /* out: the JS sibling clip */
+}
+`
+
+// ─────────────────────────────────────────────────────────────────────────
+// E. COMPOSER (chat input) — gray, fully rounded, no outline
+//   Verified vs app/chat/composer/index.tsx + styles.css:
+//     - [data-slot='composer-surface'] — the visible box holding the rich
+//       input: tailwind `rounded-[inherit] border …`, painted with
+//       `--composer-fill` (color-mix of card over background, ~opaque),
+//       border-color forced to --ui-stroke-secondary (styles.css:1918).
+//     - rounded-[inherit] chains up to the root's `rounded-2xl` (16px).
+//   The user asked: rounded corners + gray background + no outline. So we
+//   bump the surface radius past the 16px inheritance, fill it with a solid
+//   neutral gray (var(--user-gray), light/dark safe), and strip the border
+//   in every state (rest/hover/focus all paint border-color + the focus
+//   ring uses box-shadow). The `--dt-input:0`-style ring tokens are kept
+//   because the app reads them via calc() — safer to zero their *effect*
+//   than their *definition*.
+// ─────────────────────────────────────────────────────────────────────────
+const CSS_COMPOSER = `
+/* Override the app's own fill TOKEN at every state level. The surface element
+   paints background from var(--composer-fill) via an inline Tailwind style that
+   property-level overrides cannot beat - but the token itself cascades, so
+   overwriting it re-paints the whole composer (surface + docked popovers +
+   the ? help) in one place, in rest / scrolled-up / HUD states alike. */
+[data-slot='composer-root'] {
+  --composer-fill: #5a5f66 !important;
+  box-shadow: none !important;                /* kill dock glow / ring shadow */
+}
+[data-slot='composer-surface'] {
+  border-radius: 22px !important;             /* fully rounded well           */
+  background: #5a5f66 !important;             /* belt-and-braces on the token */
+  border: none !important;                    /* no outline, any state        */
+  box-shadow: none !important;
+  outline: none !important;
+}
+[data-slot='composer-root'][data-thread-scrolled-up],
+[data-slot='composer-root'][data-popped-out],
+[data-hud-shell] [data-slot='composer-root'] {
+  --composer-fill: #5a5f66 !important;        /* keep the token flat in every state */
+}
+/* Kill the app's own state-ladder + ring paints (box-shadow / border-color) */
+[data-slot='composer-surface']:hover,
+[data-slot='composer-surface']:focus,
+[data-slot='composer-surface']:focus-within {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+[data-slot='composer-root'] [class*='ring-'] {
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), none;
+}
+`
+
+const CSS = [CSS_TITLEBAR, CSS_CURSOR, CSS_BUBBLES, CSS_UNSTICK, CSS_COMPOSER].join('\n')
 
 export default {
   id: 'hermes-look',
   name: 'Hermes Look',
   description:
-    'Hides 3 titlebar buttons, normalizes the cursor (arrow app-wide, ' +
-    'I-beam kept in text, grab kept on the drag handles), and renders user ' +
-    'messages as right-pinned, content-hugging (up to 70% width) border-less ' +
-    'bubbles with left-aligned text. ' +
+    'Hides 3 titlebar buttons, normalizes the cursor, renders user messages ' +
+    'as right-parked, content-hugging border-less bubbles (full text, never ' +
+    'clamped, never pinned to the top while scrolling), and paints the chat ' +
+    'input as a plain gray, fully rounded, border-less well. ' +
     'Theme is fully Hermes\u2019 own. Delete this folder to revert.',
   register() {
     if (typeof document === 'undefined') return

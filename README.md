@@ -11,9 +11,10 @@ settings, so Hermes auto-updates keep working normally.
 |---|--------|-----|--------|
 | 1 | Hide the 3 top-right titlebar buttons (layout editor, HUD mode, swap sidebar) | `plugins/hermes-look` (CSS) | delete the plugin folder |
 | 2 | Arrows everywhere instead of pointer hands; I-beam kept inside text fields; grab hand on native sliders & drag handles | `plugins/hermes-look` (CSS) | delete the plugin folder |
-| 3 | Your messages render as right-pinned, content-hugging bubbles (up to ~2/3 of the column, long text wraps) with left-aligned text and no border line | `plugins/hermes-look` (CSS) | delete the plugin folder |
+| 3 | Your messages render as right-pinned, content-hugging bubbles (up to ~2/3 of the column) with left-aligned text, no border, and the full text shown (no clamping); they scroll with the thread instead of sticking to the top | `plugins/hermes-look` (CSS) | delete the plugin folder |
+| 4 | Chat input is a solid dark well (`#292D33`) with rounded corners, no outline/ring, and whiter typed text (`#F4F5F7`) | `plugins/hermes-look` (CSS) | delete the plugin folder |
 
-All three are one plugin (the `hermes-look` folder).
+All four are one plugin (the `hermes-look` folder).
 
 ## Install
 
@@ -47,7 +48,11 @@ handful of inline CSS seed tokens (`--theme-*` on `<html>`) plus a small set of
   (`.titlebar-icon-button:has(.codicon-…)`),
 - normalizes the cursor (arrow app-wide, I-beam in text, grab on slider/drag),
 - shrink-wraps user messages to their content and pins them right
-  (`.composer-human-message`), for Codex-style bubbles.
+  (`.composer-human-message`) for Codex-style bubbles, while releasing the
+  app's "sticky" pin so long messages show in full and scroll away with the
+  thread, and
+- restyles the chat input as a borderless rounded dark well by overriding the
+  app's own `--composer-fill` token, with white-tinted input text.
 
 It never touches app files and it never overrides your chosen theme — theme
 switching stays exactly as native. Updates to Hermes Desktop replace `src/` and

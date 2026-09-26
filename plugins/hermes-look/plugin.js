@@ -141,12 +141,12 @@ const CSS_COMPOSER = `
    overwriting it re-paints the whole composer (surface + docked popovers +
    the ? help) in one place, in rest / scrolled-up / HUD states alike. */
 [data-slot='composer-root'] {
-  --composer-fill: #4a4f57 !important;
+  --composer-fill: #292D33 !important;
   box-shadow: none !important;                /* kill dock glow / ring shadow */
 }
 [data-slot='composer-surface'] {
   border-radius: 22px !important;             /* fully rounded well           */
-  background: #4a4f57 !important;             /* belt-and-braces on the token */
+  background: #292D33 !important;             /* belt-and-braces on the token */
   border: none !important;                    /* no outline, any state        */
   box-shadow: none !important;
   outline: none !important;
@@ -154,7 +154,12 @@ const CSS_COMPOSER = `
 [data-slot='composer-root'][data-thread-scrolled-up],
 [data-slot='composer-root'][data-popped-out],
 [data-hud-shell] [data-slot='composer-root'] {
-  --composer-fill: #4a4f57 !important;        /* keep the token flat in every state */
+  --composer-fill: #292D33 !important;        /* keep the token flat in every state */
+}
+/* Whitened typed text (upstream: composer-rich-input color: var(--ui-text-primary)) */
+[data-slot='composer-surface'] [data-slot='composer-rich-input'],
+[data-slot='composer-root'] [data-slot='composer-rich-input'] {
+  color: #f4f5f7 !important;
 }
 /* Kill the app's own state-ladder + ring paints (box-shadow / border-color) */
 [data-slot='composer-surface']:hover,
